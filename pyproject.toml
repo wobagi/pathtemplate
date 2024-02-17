@@ -1,6 +1,6 @@
 [project]
 name = "pathtemplate"
-version = "0.1.0"
+version = "0.1.1"
 description = "create paths with formatted placeholders"
 authors = [
     {name = "Wojtek Baginski", email = "wobagi@gmail.com"},
