@@ -20,8 +20,8 @@ class TestTimedPath:
 
     def test_pathtemplate_emptyvalue(self):
         template = "file_{datetime:%Y%m}_{var}.txt"
-        with pytest.raises(KeyError):
-            path = PathTemplate(template, datetime=dt.datetime(2020, 1, 1, 12))
+        path = PathTemplate(template, datetime=dt.datetime(2020, 1, 1, 12))
+        assert str(path) == "file_202001_{var}.txt"
 
     def test_pathtemplate_update(self):
         template = "file_{datetime:%Y%m}_{var}.txt"
@@ -61,3 +61,33 @@ class TestTimedPath:
         path2 = path.copy()
         assert str(path2) == "file_o3"
         assert path2 is not path
+
+    def test_pathtemplate_noargs(self):
+        template = "file_{var}"
+        path = PathTemplate(template)
+        assert str(path) == "file_{var}"
+
+    def test_pathtemplate_noargs_with_float(self):
+        template = "file_{var}_{value:.2f}"
+        path = PathTemplate(template)
+        assert str(path) == "file_{var}_{value:.2f}"
+
+    def test_pathtemplate_template_noargs_with_float(self):
+        template = "file_{var}_{value:.2f}"
+        path = PathTemplate(template)
+        assert path._template == "file_{var}_{value:.2f}"
+
+    def test_pathtemplate_template_with_float(self):
+        template = "file_{var}_{value:.2f}"
+        path = PathTemplate(template, value=3.14159)
+        assert str(path) == "file_{var}_3.14"
+
+    def test_noargs_with_conversion(self):
+        template = "file_{var!e}"
+        path = PathTemplate(template)
+        assert str(path) == "file_{var!e}"
+
+    def test_pathtemplate_noargs_with_datetime(self):
+        template = "file_{datetime:%Y%m%d}"
+        path = PathTemplate(template)
+        assert str(path) == "file_{datetime:%Y%m%d}"

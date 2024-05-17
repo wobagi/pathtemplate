@@ -58,6 +58,7 @@ class PathTemplate:
         """
         if isinstance(other, str):
             other = PathTemplate(other)
+
         return PathTemplate(str(self._path / other._path), **self._params)
 
     @property
@@ -92,15 +93,37 @@ class PathTemplate:
         c.update(**kwargs)
         return c
 
+    def join_format_spec(self, literal_text, field_name, format_spec, conversion):
+        if field_name is None:
+            return literal_text
+
+        if format_spec is None or format_spec == "":
+            spec = ""
+        else:
+            spec = f":{format_spec}"
+        
+        conversion = "" if conversion is None else f"!{conversion}"
+        return f"{literal_text}{{{field_name}{spec}{conversion}}}"
+    
+
     def update_pathstring(self) -> NoReturn:
         """
         Update path string
         """
-        try:
-            self._pathstring = self._formatter.format(self._template, **self._params)
-        except KeyError as e:
-            raise KeyError(f"Value for placeholder {e} not provided.")
+        # if some placeholders are missing, fill them with the same name in brackets
+
+        chunks = list(self._formatter.parse(self._template))
+        new_chunks = []
+
+        for literal_text, field_name, format_spec, conversion in chunks:
+            chunk = self.join_format_spec(literal_text, field_name, format_spec, conversion)
+            if field_name in self._params:
+                chunk = self._formatter.format(chunk, **self._params)
+            new_chunks.append(chunk)
+        
+        self._pathstring = "".join(new_chunks)
         self._path = pathlib.Path(self._pathstring)
+
 
     def update(self, **kwargs: Dict[str, Any]) -> "PathTemplate":
         """
