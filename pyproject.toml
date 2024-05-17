@@ -1,6 +1,6 @@
 [project]
 name = "pathtemplate"
-version = "0.1.1"
+version = "0.1.2"
 description = "create paths with formatted placeholders"
 authors = [
     {name = "Wojtek Baginski", email = "wobagi@gmail.com"},
@@ -22,5 +22,6 @@ testpaths = [
     "tests",
 ]
 
+
 [tool.pdm]
-package-type = "library"
+distribution = true
